@@ -13,7 +13,7 @@ import GoogleCirclesExtended from 'mdi-material-ui/GoogleCirclesExtended'
 // ** Type import
 import { VerticalNavItemsType } from 'src/@core/layouts/types'
 
-const navigation = (): VerticalNavItemsType => {
+const navigation = (): VerticalNavItemsType => {  
   return [
     {
       title: 'Dashboard',
@@ -24,6 +24,11 @@ const navigation = (): VerticalNavItemsType => {
       title: 'Account Settings',
       icon: AccountCogOutline,
       path: '/account-settings'
+    },
+    {
+      title: 'Users',
+      icon: AccountCogOutline,
+      path: '/all-users'
     },
     // {
     //   sectionTitle: 'Pages'

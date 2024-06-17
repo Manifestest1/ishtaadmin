@@ -1,4 +1,5 @@
 // ** MUI Imports
+import { createContext, useState, useEffect } from 'react';
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import Chip from '@mui/material/Chip'
@@ -8,7 +9,13 @@ import TableHead from '@mui/material/TableHead'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import Typography from '@mui/material/Typography'
-import TableContainer from '@mui/material/TableContainer'
+import TableContainer from '@mui/material/TableContainer' 
+import CheckIcon from '@mui/icons-material/Check';
+import CloseIcon from '@mui/icons-material/Close';
+import IconButton from '@mui/material/IconButton';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { format } from 'date-fns';
+import {userStatusUpdate,getAllUsers,userDelete} from 'src/context/api/apiService';
 
 // ** Types Imports
 import { ThemeColor } from 'src/@core/layouts/types'
@@ -113,44 +120,105 @@ const statusObj: StatusObj = {
 }
 
 const DashboardTable = () => {
+
+  const [isActive, setIsActive] = useState(null);
+
+  const [alluser, setAllUser] = useState(null);
+
+  useEffect(() => {
+      const token = localStorage.getItem('token');  
+      if (token) 
+      {
+          getAllUsers()
+              .then(response => {
+                  console.log(response.data,"Check Api");
+                  setAllUser(response.data);
+              
+              })
+              .catch((error) => {
+                  if (error.response.status === 401) 
+                  {
+                    // Handle unauthorized access
+                  }
+              });
+      } 
+     
+  }, []);
+
+  const handleClick = (userId, currentStatus) => {
+    // Toggle the status (this is a simplified approach; you might have a more complex logic)
+    const newStatus = !currentStatus;
+    console.log(userId,newStatus,"id and status");
+
+    // Assuming statusUpdate API updates the status for a user
+    userStatusUpdate(userId, newStatus)
+      .then(response => {
+        console.log(response,"User UPdate");
+        const updatedUsers = alluser.map(user =>
+          user.id === userId ? { ...user, isActive: newStatus } : user
+        );
+        setAllUser(updatedUsers);
+      })
+      .catch(error => {
+        console.error('Error updating user status:', error);
+        // Handle error state or notify user about the error
+      });
+  };
+
+  const handleClickUserDelete = (userId) => {
+    console.log(userId,"In Delete Function");
+
+    if (confirm('Are you sure you want to delete this user?')) 
+    {
+      userDelete(userId)
+      .then(response => {
+        console.log(response,"User UPdate");
+        setAllUser(alluser.filter(user => user.id !== userId));
+      })
+      .catch(error => {
+        console.error('Error updating user status:', error);
+        // Handle error state or notify user about the error
+      });
+     
+    }
+
+  }
   return (
     <Card>
       <TableContainer>
         <Table sx={{ minWidth: 800 }} aria-label='table in dashboard'>
           <TableHead>
             <TableRow>
+              <TableCell>Serinal No.</TableCell>
+              <TableCell>Id</TableCell>
               <TableCell>Name</TableCell>
               <TableCell>Email</TableCell>
-              <TableCell>Date</TableCell>
-              <TableCell>Salary</TableCell>
-              <TableCell>Age</TableCell>
+              <TableCell>Register Date</TableCell>
               <TableCell>Status</TableCell>
+              <TableCell>Action</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row: RowType) => (
-              <TableRow hover key={row.name} sx={{ '&:last-of-type td, &:last-of-type th': { border: 0 } }}>
+            {alluser && alluser.map((user, index) => (
+              <TableRow hover key={index} sx={{ '&:last-of-type td, &:last-of-type th': { border: 0 } }}>
+                   <TableCell>{index + 1}</TableCell>
+                   <TableCell>{user.id}</TableCell>
                 <TableCell sx={{ py: theme => `${theme.spacing(0.5)} !important` }}>
                   <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                    <Typography sx={{ fontWeight: 500, fontSize: '0.875rem !important' }}>{row.name}</Typography>
-                    <Typography variant='caption'>{row.designation}</Typography>
+                    <Typography sx={{ fontWeight: 500, fontSize: '0.875rem !important' }}>{user.name}</Typography>
                   </Box>
                 </TableCell>
-                <TableCell>{row.email}</TableCell>
-                <TableCell>{row.date}</TableCell>
-                <TableCell>{row.salary}</TableCell>
-                <TableCell>{row.age}</TableCell>
-                <TableCell>
-                  <Chip
-                    label={row.status}
-                    color={statusObj[row.status].color}
-                    sx={{
-                      height: 24,
-                      fontSize: '0.75rem',
-                      textTransform: 'capitalize',
-                      '& .MuiChip-label': { fontWeight: 500 }
-                    }}
-                  />
+                <TableCell>{user.email}</TableCell>
+                <TableCell>{format(new Date(user.createdAt), 'yyyy-MM-dd')}</TableCell>
+                <TableCell onClick={() => handleClick(user.id, user.isActive)}>
+                <IconButton aria-label="status">
+                 {user.isActive ? <CheckIcon color="success" /> : <CloseIcon color="error" />}
+                 </IconButton>
+                </TableCell>
+                <TableCell onClick={() => handleClickUserDelete(user.id)}>
+                  <IconButton aria-label="delete">
+                      <DeleteIcon color="error"/>
+                  </IconButton>
                 </TableCell>
               </TableRow>
             ))}

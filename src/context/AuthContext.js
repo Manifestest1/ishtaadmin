@@ -10,16 +10,14 @@ export const AuthProvider = ({ children }) => {
     const router = useRouter();
 
     useEffect(() => {
-        const token = localStorage.getItem('token'); 
+        const token = localStorage.getItem('token');  
         if (token) 
         {
-            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
             axios.get('/admin_user')
                 .then(response => {
                     setUser(response.data);
                     console.log(response,"Check Api");
                     setLoading(false);
-                    // router.push('/dashboard');
                 })
                 .catch(() => {
                     localStorage.removeItem('token');
@@ -37,7 +35,6 @@ export const AuthProvider = ({ children }) => {
         console.log(response,"Check Api");
         const token = response.data.authorisation;
         localStorage.setItem('token', token);
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         setUser(response.data.admin);
         router.push('/dashboard');
     };

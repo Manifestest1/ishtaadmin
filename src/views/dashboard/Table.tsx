@@ -1,21 +1,28 @@
 // ** MUI Imports
 import { createContext, useState, useEffect } from 'react';
-import Box from '@mui/material/Box'
-import Card from '@mui/material/Card'
+import { Grid, Card, CardHeader, CardContent, IconButton, Typography, Box, Button, MenuItem, FormControl, InputLabel, Select } from '@mui/material';
+// import Box from '@mui/material/Box'
+// import Card from '@mui/material/Card'
 import Chip from '@mui/material/Chip'
 import Table from '@mui/material/Table'
 import TableRow from '@mui/material/TableRow'
 import TableHead from '@mui/material/TableHead'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
-import Typography from '@mui/material/Typography'
+// import Typography from '@mui/material/Typography'
 import TableContainer from '@mui/material/TableContainer' 
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
-import IconButton from '@mui/material/IconButton';
+// import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { format } from 'date-fns';
 import {userStatusUpdate,getAllUsers,userDelete} from 'src/context/api/apiService';
+
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
 // ** Types Imports
 import { ThemeColor } from 'src/@core/layouts/types'
@@ -121,9 +128,10 @@ const statusObj: StatusObj = {
 
 const DashboardTable = () => {
 
-  const [isActive, setIsActive] = useState(null);
-
   const [alluser, setAllUser] = useState(null);
+
+  const [open, setOpen] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState(null);
 
   useEffect(() => {
       const token = localStorage.getItem('token');  
@@ -148,7 +156,6 @@ const DashboardTable = () => {
   const handleClick = (userId, currentStatus) => {
     // Toggle the status (this is a simplified approach; you might have a more complex logic)
     const newStatus = !currentStatus;
-    console.log(userId,newStatus,"id and status");
 
     // Assuming statusUpdate API updates the status for a user
     userStatusUpdate(userId, newStatus)
@@ -165,24 +172,49 @@ const DashboardTable = () => {
       });
   };
 
-  const handleClickUserDelete = (userId) => {
-    console.log(userId,"In Delete Function");
+  // const handleClickUserDelete = (userId) => {
+  //   console.log(userId,"In Delete Function");
 
-    if (confirm('Are you sure you want to delete this user?')) 
-    {
-      userDelete(userId)
-      .then(response => {
-        console.log(response,"User UPdate");
-        setAllUser(alluser.filter(user => user.id !== userId));
-      })
-      .catch(error => {
-        console.error('Error updating user status:', error);
-        // Handle error state or notify user about the error
-      });
+  //   if (confirm('Are you sure you want to delete this user?')) 
+  //   {
+  //     userDelete(userId)
+  //     .then(response => {
+  //       console.log(response,"User UPdate");
+  //       setAllUser(alluser.filter(user => user.id !== userId));
+  //     })
+  //     .catch(error => {
+  //       console.error('Error updating user status:', error);
+  //       // Handle error state or notify user about the error
+  //     });
      
-    }
+  //   }
 
-  }
+  // }
+
+  const handleClickUserDelete = (userId) => {
+    setSelectedUserId(userId);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+      setOpen(false);
+      setSelectedUserId(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    try 
+    {
+        await userDelete(selectedUserId);
+        setAllUser(alluser.filter(user => user.id !== selectedUserId));
+        handleClose();
+    } 
+    catch (error) 
+    {
+        console.error('Error deleting user:', error);
+        handleClose();
+    }
+  };
+
   return (
     <Card>
       <TableContainer>
@@ -225,7 +257,22 @@ const DashboardTable = () => {
           </TableBody>
         </Table>
       </TableContainer>
+
+      {/* Dialog Box For User Delete */}
+
+      <Dialog open={open} onClose={handleClose} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+        <DialogTitle id="alert-dialog-title">{"Confirm Delete"}</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">Are you sure you want to delete this user?</DialogContentText>
+          </DialogContent>
+          <DialogActions>
+              <Button onClick={handleClose} color="primary">Cancel</Button>
+              <Button onClick={handleConfirmDelete} color="primary" autoFocus>Delete</Button>
+          </DialogActions>
+      </Dialog>
     </Card>
+
+    
   )
 }
 

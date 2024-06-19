@@ -30,6 +30,16 @@ const navigation = (): VerticalNavItemsType => {
       icon: AccountCogOutline,
       path: '/all-users'
     },
+    {
+      title: 'Filter Category',
+      icon: CreditCardOutline,
+      path: '/filters/add_filter_category'
+    },
+    {
+      title: 'Filters',
+      icon: CreditCardOutline,
+      path: '/filters'
+    },
     // {
     //   sectionTitle: 'Pages'
     // },

@@ -51,7 +51,7 @@ const rows: RowType[] = [
     name: 'Sally Quinn',
     salary: '$19586.23',
     email: 'eebsworth2m@sbwire.com',
-    designation: 'Human Resources Assistant'
+    designation: 'Human Resources Assistant' 
   },
   {
     age: 61,
@@ -162,7 +162,7 @@ const DashboardTable = () => {
       .then(response => {
         console.log(response,"User UPdate");
         const updatedUsers = alluser.map(user =>
-          user.id === userId ? { ...user, isActive: newStatus } : user
+          user.id === userId ? { ...user, is_active: newStatus } : user
         );
         setAllUser(updatedUsers);
       })
@@ -172,24 +172,6 @@ const DashboardTable = () => {
       });
   };
 
-  // const handleClickUserDelete = (userId) => {
-  //   console.log(userId,"In Delete Function");
-
-  //   if (confirm('Are you sure you want to delete this user?')) 
-  //   {
-  //     userDelete(userId)
-  //     .then(response => {
-  //       console.log(response,"User UPdate");
-  //       setAllUser(alluser.filter(user => user.id !== userId));
-  //     })
-  //     .catch(error => {
-  //       console.error('Error updating user status:', error);
-  //       // Handle error state or notify user about the error
-  //     });
-     
-  //   }
-
-  // }
 
   const handleClickUserDelete = (userId) => {
     setSelectedUserId(userId);
@@ -222,7 +204,7 @@ const DashboardTable = () => {
           <TableHead>
             <TableRow>
               <TableCell>Serinal No.</TableCell>
-              <TableCell>Id</TableCell>
+              <TableCell># Id</TableCell>
               <TableCell>Name</TableCell>
               <TableCell>Email</TableCell>
               <TableCell>Register Date</TableCell>
@@ -234,7 +216,7 @@ const DashboardTable = () => {
             {alluser && alluser.map((user, index) => (
               <TableRow hover key={index} sx={{ '&:last-of-type td, &:last-of-type th': { border: 0 } }}>
                    <TableCell>{index + 1}</TableCell>
-                   <TableCell>{user.id}</TableCell>
+                   <TableCell>#{user.id}</TableCell>
                 <TableCell sx={{ py: theme => `${theme.spacing(0.5)} !important` }}>
                   <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                     <Typography sx={{ fontWeight: 500, fontSize: '0.875rem !important' }}>{user.name}</Typography>
@@ -242,9 +224,9 @@ const DashboardTable = () => {
                 </TableCell>
                 <TableCell>{user.email}</TableCell>
                 <TableCell>{format(new Date(user.createdAt), 'yyyy-MM-dd')}</TableCell>
-                <TableCell onClick={() => handleClick(user.id, user.isActive)}>
+                <TableCell onClick={() => handleClick(user.id, user.is_active)}>
                 <IconButton aria-label="status">
-                 {user.isActive ? <CheckIcon color="success" /> : <CloseIcon color="error" />}
+                 {user.is_active ? <CheckIcon color="success" /> : <CloseIcon color="error" />}
                  </IconButton>
                 </TableCell>
                 <TableCell onClick={() => handleClickUserDelete(user.id)}>

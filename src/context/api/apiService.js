@@ -11,3 +11,18 @@ export const getAllUsers = () => {
   export const userDelete = (userId) => { 
     return axios.put(`/user/${userId}/delete`);
   };
+
+  // Filters Api
+
+  export const addFiltersCategory = (name,order_no) => {
+    return axios.post('/add_filters_category', {name,order_no});
+  };
+
+  export const getFiltersCategory = () => { 
+    return axios.get('/get_filters_category');
+  };
+
+  export const addFiltersData = (formData) => {
+    return axios.post('/add_filters_data', formData);
+  };
+
